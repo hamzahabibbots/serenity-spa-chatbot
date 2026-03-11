@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serenity Spa — Bengaluru | Book Your Experience</title>
+<meta name="description" content="Premium spa experiences in Bengaluru. Book Swedish Massage, Deep Tissue, Couple's Spa, Facials and more at Serenity Spa.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   SERENITY SPA CHATBOT — PREMIUM STYLES
+   Color Palette:
+   - Deep Mocha:    #3E2723, #4E342E, #5D4037
+   - Champagne:     #D4A574, #C9A96E, #E8D5B7
+   - Ivory/Cream:   #FDF8F0, #FAF3E8, #F5EDE0
+   - Dusty Rose:    #C4A08A, #B5838D, #D4A59A
+   - Accent Gold:   #B8860B, #DAA520
+   ═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── Landing page background ── */
+body{font-family:'DM Sans',sans-serif;background:#FDF8F0;color:#3E2723;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.landing{text-align:center;padding:2rem}
+.landing h1{font-family:'Cormorant Garamond',serif;font-size:3rem;color:#3E2723;margin-bottom:.5rem}
+.landing p{color:#5D4037;font-size:1.1rem;opacity:.8}
+
+/* ── Floating toggle button ── */
+#chat-toggle{position:fixed;bottom:28px;right:28px;width:64px;height:64px;border-radius:50%;border:none;background:linear-gradient(135deg,#5D4037,#3E2723);color:#E8D5B7;font-size:1.6rem;cursor:pointer;box-shadow:0 6px 24px rgba(62,39,35,.35);z-index:10000;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;display:flex;align-items:center;justify-content:center}
+#chat-toggle:hover{transform:scale(1.08);box-shadow:0 8px 32px rgba(62,39,35,.45)}
+#chat-toggle.open{transform:rotate(90deg) scale(1.08)}
+#chat-toggle .icon-open,#chat-toggle .icon-close{position:absolute;transition:opacity .25s}
+#chat-toggle.open .icon-open{opacity:0}
+#chat-toggle:not(.open) .icon-close{opacity:0}
+
+/* ── Chat window ── */
+#chat-window{position:fixed;bottom:104px;right:28px;width:400px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 140px);border-radius:20px;background:#FDF8F0;box-shadow:0 12px 48px rgba(62,39,35,.22);z-index:9999;display:flex;flex-direction:column;overflow:hidden;opacity:0;transform:translateY(20px) scale(.96);pointer-events:none;transition:opacity .4s cubic-bezier(.25,.8,.25,1),transform .4s cubic-bezier(.25,.8,.25,1)}
+#chat-window.visible{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+
+/* ── Header ── */
+.chat-header{background:linear-gradient(135deg,#3E2723 0%,#5D4037 100%);padding:18px 20px;display:flex;align-items:center;gap:12px;position:relative}
+.chat-header .spa-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#C9A96E,#D4A574);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.chat-header .header-text h2{font-family:'Cormorant Garamond',serif;color:#E8D5B7;font-size:1.15rem;font-weight:600}
+.chat-header .header-text p{color:#C4A08A;font-size:.75rem;margin-top:2px}
+#lang-toggle{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.12);border:1px solid rgba(228,213,183,.25);color:#E8D5B7;font-size:.7rem;padding:4px 10px;border-radius:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
+#lang-toggle:hover{background:rgba(255,255,255,.22)}
+
+/* ── Messages area ── */
+.chat-body{flex:1;overflow-y:auto;padding:16px 16px 8px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth}
+.chat-body::-webkit-scrollbar{width:5px}
+.chat-body::-webkit-scrollbar-thumb{background:#D4A574;border-radius:4px}
+
+/* ── Bubbles ── */
+.msg{display:flex;gap:8px;max-width:88%;animation:fadeInMsg .45s ease both}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#C9A96E,#D4A574);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:4px}
+.msg.user .avatar{display:none}
+.bubble{padding:11px 15px;border-radius:16px;font-size:.88rem;line-height:1.55;position:relative}
+.msg.bot .bubble{background:#F5EDE0;color:#3E2723;border-bottom-left-radius:4px}
+.msg.user .bubble{background:linear-gradient(135deg,#5D4037,#4E342E);color:#FAF3E8;border-bottom-right-radius:4px}
+@keyframes fadeInMsg{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Typing indicator ── */
+.typing{display:flex;gap:5px;padding:10px 16px;align-self:flex-start}
+.typing span{width:8px;height:8px;background:#D4A574;border-radius:50%;animation:typingDot 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1.15)}}
+
+/* ── Option buttons ── */
+.options-row{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;animation:fadeInMsg .45s ease both}
+.opt-btn{padding:9px 16px;border-radius:20px;border:1.5px solid #D4A574;background:transparent;color:#5D4037;font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .25s}
+.opt-btn:hover{background:linear-gradient(135deg,#D4A574,#C9A96E);color:#fff;border-color:#C9A96E;transform:translateY(-1px)}
+.opt-btn.selected{background:linear-gradient(135deg,#5D4037,#4E342E);color:#E8D5B7;border-color:#5D4037;pointer-events:none}
+
+/* ── Input area ── */
+.chat-input-area{padding:12px 16px;background:#FAF3E8;border-top:1px solid rgba(212,165,116,.2);display:flex;gap:8px;align-items:center}
+#chat-input{flex:1;border:1.5px solid rgba(212,165,116,.3);background:#FDF8F0;border-radius:20px;padding:10px 16px;font-size:.88rem;font-family:'DM Sans',sans-serif;color:#3E2723;outline:none;transition:border-color .2s}
+#chat-input:focus{border-color:#D4A574}
+#chat-input::placeholder{color:#C4A08A}
+#send-btn{width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,#5D4037,#3E2723);color:#E8D5B7;font-size:1.1rem;cursor:pointer;transition:transform .2s}
+#send-btn:hover{transform:scale(1.06)}
+.chat-input-area.disabled{pointer-events:none;opacity:.5}
+
+/* ── Date picker ── */
+.date-picker-wrap{animation:fadeInMsg .45s ease both}
+.date-picker-wrap input[type="date"]{width:100%;padding:10px 14px;border:1.5px solid #D4A574;border-radius:12px;background:#FDF8F0;font-family:'DM Sans',sans-serif;font-size:.88rem;color:#3E2723;outline:none;cursor:pointer}
+.date-picker-wrap input[type="date"]:focus{border-color:#5D4037}
+.date-confirm-btn{margin-top:8px;padding:8px 20px;border-radius:16px;border:none;background:linear-gradient(135deg,#5D4037,#3E2723);color:#E8D5B7;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;transition:transform .2s}
+.date-confirm-btn:hover{transform:scale(1.04)}
+
+/* ── Service description card ── */
+.service-card{background:linear-gradient(135deg,#FAF3E8,#F5EDE0);border:1px solid rgba(212,165,116,.3);border-radius:14px;padding:16px;margin:4px 0;animation:fadeInMsg .45s ease both}
+.service-card h4{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:#3E2723;margin-bottom:6px}
+.service-card p{font-size:.82rem;color:#5D4037;line-height:1.5;margin-bottom:4px}
+.service-card .price-tag{font-weight:600;color:#B8860B;font-size:.9rem}
+
+/* ── Summary card ── */
+.summary-card{background:linear-gradient(145deg,#FDF8F0,#FAF3E8);border:2px solid #D4A574;border-radius:16px;padding:20px;margin:8px 0;position:relative;overflow:hidden;animation:fadeInMsg .5s ease both}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#D4A574,#C9A96E,#D4A574)}
+.summary-card h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:#3E2723;text-align:center;margin-bottom:14px}
+.summary-card .detail-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(212,165,116,.15);font-size:.84rem}
+.summary-card .detail-row:last-of-type{border-bottom:none}
+.summary-card .detail-label{color:#8D6E63}
+.summary-card .detail-value{color:#3E2723;font-weight:500;text-align:right;max-width:60%}
+.summary-card .spa-watermark{position:absolute;bottom:8px;right:14px;font-family:'Cormorant Garamond',serif;font-size:.7rem;color:rgba(212,165,116,.4);font-style:italic}
+
+/* ── Confirm booking button ── */
+.confirm-btn{display:block;width:100%;padding:13px;border:none;border-radius:14px;background:linear-gradient(135deg,#5D4037,#3E2723);color:#E8D5B7;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:6px;transition:transform .2s,box-shadow .2s;animation:fadeInMsg .45s ease both}
+.confirm-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(62,39,35,.3)}
+
+/* ── Confirmation screen ── */
+.confirmation-screen{text-align:center;padding:24px 16px;animation:fadeInMsg .6s ease both}
+.confirmation-screen .check-circle{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#C9A96E,#D4A574);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:2rem;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .2s both}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.confirmation-screen h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#3E2723;margin-bottom:6px}
+.confirmation-screen .ref-num{font-size:.85rem;color:#B8860B;font-weight:600;margin-bottom:12px}
+.confirmation-screen p{font-size:.84rem;color:#5D4037;margin-bottom:16px}
+.whatsapp-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:14px;border:none;background:#25D366;color:#fff;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:transform .2s}
+.whatsapp-btn:hover{transform:translateY(-2px)}
+
+/* ── Special request textarea ── */
+.special-req-wrap{animation:fadeInMsg .45s ease both}
+.special-req-wrap textarea{width:100%;padding:10px 14px;border:1.5px solid #D4A574;border-radius:12px;background:#FDF8F0;font-family:'DM Sans',sans-serif;font-size:.85rem;color:#3E2723;outline:none;resize:vertical;min-height:60px}
+.special-req-wrap textarea:focus{border-color:#5D4037}
+.special-req-wrap button{margin-top:8px;padding:8px 20px;border-radius:16px;border:none;background:linear-gradient(135deg,#5D4037,#3E2723);color:#E8D5B7;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer}
+
+/* ── Responsive ── */
+@media(max-width:480px){#chat-window{bottom:0;right:0;width:100%;height:100vh;max-height:100vh;border-radius:0}#chat-toggle{bottom:16px;right:16px;width:56px;height:56px}}
+</style>
+</head>
+<body>
+
+<!-- Landing page -->
+<div class="landing">
+  <h1>🌿 Serenity Spa</h1>
+  <p>Premium Wellness Experiences — Bengaluru</p>
+</div>
+
+<!-- Chat toggle -->
+<button id="chat-toggle" aria-label="Open chat">
+  <span class="icon-open">🌿</span>
+  <span class="icon-close">✕</span>
+</button>
+
+<!-- Chat window -->
+<div id="chat-window">
+  <div class="chat-header">
+    <div class="spa-avatar">🍃</div>
+    <div class="header-text">
+      <h2>Serenity Spa</h2>
+      <p>Your wellness journey starts here</p>
+    </div>
+    <button id="lang-toggle" aria-label="Switch language">हिंदी</button>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-input-area" id="input-area">
+    <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+    <button id="send-btn" aria-label="Send">➤</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  SERENITY SPA CHATBOT — CORE LOGIC
+//  Single-file vanilla JS, localStorage persistence
+// ═══════════════════════════════════════════════════════
+
+/* ── Multilingual content ── */
+const LANG = {
+  en: {
+    greet: "Welcome to Serenity Spa 🌿 I'm here to help you book a truly relaxing experience. May I know your name?",
+    greetBack: "Welcome back, {name}! We're glad you're treating yourself again 🌿 What would you like to book today?",
+    askReturning: "Lovely to have you here, {name} ✨ Have you visited Serenity Spa before?",
+    returningOpts: ["Yes, I have", "No, first time"],
+    askMood: "What are you looking for today, {name}?",
+    moodOpts: ["Relaxation", "Pain Relief", "Skin Care", "A Treat for Someone Special"],
+    moodResp: {
+      "Relaxation": "Wonderful — let's find something to melt all that stress away 💆",
+      "Pain Relief": "We'll make sure you leave feeling renewed and pain-free 🙌",
+      "Skin Care": "Glowing skin, coming right up! ✨",
+      "A Treat for Someone Special": "How thoughtful! Let's make it truly memorable 🎁"
+    },
+    askService: "Here are our signature experiences — which one speaks to you?",
+    serviceOpts: ["Swedish Massage", "Deep Tissue", "Couple's Spa", "Facial", "Body Scrub", "Other"],
+    askDate: "When would you like to visit us? Pick a date that works for you:",
+    askTime: "And your preferred time slot?",
+    timeOpts: ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM"],
+    askTherapist: "Do you have a preferred therapist, or shall we assign our best available?",
+    therapistOpts: ["No preference", "I have a preference"],
+    askTherapistName: "Sure! Please type the therapist's name:",
+    askPhone: "Could I have your phone number for the booking confirmation?",
+    askEmail: "And your email address, please?",
+    askSpecial: "Any special requests or things we should know? (allergies, pressure preference, etc.)",
+    specialPlaceholder: "e.g. Light pressure please, allergic to nuts...",
+    skipText: "No, that's all",
+    summary: "Here's your booking summary — please review:",
+    confirmBtn: "Confirm Booking ✨",
+    confirmed: "You're all set, {name}! 🎉",
+    confirmSub: "Your tranquil experience awaits.",
+    confirmMsg: "We've reserved your spot. You'll receive a confirmation shortly.",
+    whatsappBtn: "📱 Send to WhatsApp",
+    followUp1: "Hey {name}, still thinking about it? Your slot is not confirmed yet — it only takes 30 more seconds to lock it in 🌿",
+    followUp2: "We'd love to have you in. Whenever you're ready, just pick up where you left off 💆",
+    summaryLabels: {name:"Name",service:"Service",date:"Date",time:"Time",therapist:"Therapist",phone:"Phone",email:"Email",special:"Special Requests"},
+    placeholder: "Type your message...",
+    headerSub: "Your wellness journey starts here",
+    langBtn: "हिंदी"
+  },
+  hi: {
+    greet: "सेरेनिटी स्पा में आपका स्वागत है 🌿 मैं आपकी बुकिंग में मदद करने के लिए यहाँ हूँ। आपका शुभ नाम?",
+    greetBack: "वापसी पर स्वागत है, {name}! खुशी है कि आप फिर से अपना ख्याल रख रहे हैं 🌿",
+    askReturning: "यहाँ आकर अच्छा लगा, {name} ✨ क्या आप पहले सेरेनिटी स्पा आ चुके हैं?",
+    returningOpts: ["हाँ, आ चुका/चुकी हूँ", "नहीं, पहली बार"],
+    askMood: "आज आप क्या ढूंढ रहे हैं, {name}?",
+    moodOpts: ["आराम", "दर्द से राहत", "त्वचा की देखभाल", "किसी खास के लिए उपहार"],
+    moodResp: {
+      "आराम": "बहुत बढ़िया — चलिए सारा तनाव दूर करते हैं 💆",
+      "दर्द से राहत": "हम सुनिश्चित करेंगे कि आप तरोताज़ा महसूस करें 🙌",
+      "त्वचा की देखभाल": "चमकती त्वचा, बस अभी! ✨",
+      "किसी खास के लिए उपहार": "कितना सोचा-समझा! चलिए इसे यादगार बनाते हैं 🎁"
+    },
+    askService: "हमारे विशेष अनुभव — कौन सा आपको पसंद है?",
+    serviceOpts: ["स्वीडिश मसाज", "डीप टिश्यू", "कपल्स स्पा", "फेशियल", "बॉडी स्क्रब", "अन्य"],
+    askDate: "आप कब आना चाहेंगे? एक तारीख चुनें:",
+    askTime: "और आपका पसंदीदा समय?",
+    timeOpts: ["सुबह 10", "दोपहर 12", "दोपहर 2", "शाम 4", "शाम 6"],
+    askTherapist: "क्या आपकी कोई थेरेपिस्ट पसंद है, या हम अपना सबसे अच्छा उपलब्ध भेजें?",
+    therapistOpts: ["कोई पसंद नहीं", "मेरी पसंद है"],
+    askTherapistName: "बिल्कुल! कृपया थेरेपिस्ट का नाम लिखें:",
+    askPhone: "बुकिंग की पुष्टि के लिए आपका फ़ोन नंबर?",
+    askEmail: "और आपका ईमेल पता?",
+    askSpecial: "कोई विशेष अनुरोध? (एलर्जी, दबाव प्राथमिकता, आदि)",
+    specialPlaceholder: "जैसे: हल्का दबाव, नट्स से एलर्जी...",
+    skipText: "नहीं, बस इतना ही",
+    summary: "आपकी बुकिंग का सारांश — कृपया जाँचें:",
+    confirmBtn: "बुकिंग पक्की करें ✨",
+    confirmed: "सब तैयार है, {name}! 🎉",
+    confirmSub: "आपका शांतिपूर्ण अनुभव आपका इंतज़ार कर रहा है।",
+    confirmMsg: "हमने आपकी जगह आरक्षित कर ली है। आपको जल्द ही पुष्टि मिलेगी।",
+    whatsappBtn: "📱 WhatsApp पर भेजें",
+    followUp1: "अरे {name}, अभी भी सोच रहे हैं? आपका स्लॉट अभी पक्का नहीं हुआ — बस 30 सेकंड और लगेंगे 🌿",
+    followUp2: "हम आपका इंतज़ार कर रहे हैं। जब भी तैयार हों, वहीं से शुरू करें जहाँ छोड़ा था 💆",
+    summaryLabels: {name:"नाम",service:"सेवा",date:"तारीख",time:"समय",therapist:"थेरेपिस्ट",phone:"फ़ोन",email:"ईमेल",special:"विशेष अनुरोध"},
+    placeholder: "अपना संदेश लिखें...",
+    headerSub: "आपकी कल्याण यात्रा यहाँ से शुरू होती है",
+    langBtn: "English"
+  }
+};
+
+/* ── Service details ── */
+const SERVICES = {
+  "Swedish Massage": {desc:"60 mins of full-body relaxation using long, flowing strokes. A timeless classic for unwinding.", price:"₹2,500", dur:"60 min"},
+  "Deep Tissue":     {desc:"75 mins of targeted muscle therapy to release deep-seated tension and knots.", price:"₹3,200", dur:"75 min"},
+  "Couple's Spa":    {desc:"90 mins shared bliss — side-by-side massage for two, with aromatherapy and warm towels.", price:"₹5,500", dur:"90 min"},
+  "Facial":          {desc:"45 mins of luxurious skin renewal with organic serums and a radiance-boosting mask.", price:"₹2,000", dur:"45 min"},
+  "Body Scrub":      {desc:"50 mins of gentle exfoliation with natural salts and essential oils for silky-smooth skin.", price:"₹2,200", dur:"50 min"},
+  "Other":           {desc:"Tell us what you'd like and we'll craft a bespoke experience just for you.", price:"Custom", dur:"Flexible"},
+  // Hindi mappings
+  "स्वीडिश मसाज": {desc:"60 मिनट की पूरे शरीर की विश्राम मालिश। तनाव दूर करने का शानदार तरीका।", price:"₹2,500", dur:"60 मिनट"},
+  "डीप टिश्यू":     {desc:"75 मिनट की गहरी मांसपेशियों की थेरेपी।", price:"₹3,200", dur:"75 मिनट"},
+  "कपल्स स्पा":    {desc:"90 मिनट का साझा आनंद — दो लोगों के लिए साथ-साथ मालिश।", price:"₹5,500", dur:"90 मिनट"},
+  "फेशियल":          {desc:"45 मिनट की त्वचा नवीनीकरण थेरेपी।", price:"₹2,000", dur:"45 मिनट"},
+  "बॉडी स्क्रब":      {desc:"50 मिनट का प्राकृतिक एक्सफोलिएशन।", price:"₹2,200", dur:"50 मिनट"},
+  "अन्य":           {desc:"आप बताएं और हम आपके लिए विशेष अनुभव तैयार करेंगे।", price:"कस्टम", dur:"लचीला"}
+};
+
+// Map Hindi services → English for internal tracking
+const HINDI_TO_EN = {"स्वीडिश मसाज":"Swedish Massage","डीप टिश्यू":"Deep Tissue","कपल्स स्पा":"Couple's Spa","फेशियल":"Facial","बॉडी स्क्रब":"Body Scrub","अन्य":"Other"};
+const HINDI_MOODS = {"आराम":"Relaxation","दर्द से राहत":"Pain Relief","त्वचा की देखभाल":"Skin Care","किसी खास के लिए उपहार":"A Treat for Someone Special"};
+const TIME_MAP_HI = {"सुबह 10":"10:00 AM","दोपहर 12":"12:00 PM","दोपहर 2":"2:00 PM","शाम 4":"4:00 PM","शाम 6":"6:00 PM"};
+
+// ── State ──
+const STORE_KEY = 'serenity_spa_state';
+let state = loadState();
+let lang = state.lang || 'en';
+let followUpTimer1 = null, followUpTimer2 = null;
+
+function defaultState() {
+  return {step:'init',name:'',returning:false,mood:'',service:'',date:'',time:'',therapist:'',phone:'',email:'',special:'',lang:'en',confirmed:false,followUp1Sent:false,followUp2Sent:false,messages:[]};
+}
+function loadState() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); return s && s.step ? s : defaultState(); }
+  catch(e) { return defaultState(); }
+}
+function saveState() { state.lang = lang; localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function t(key) { return LANG[lang][key] || LANG.en[key] || key; }
+
+// ── DOM refs ──
+const chatBody = document.getElementById('chat-body');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+const inputArea = document.getElementById('input-area');
+const chatWindow = document.getElementById('chat-window');
+const chatToggle = document.getElementById('chat-toggle');
+const langToggle = document.getElementById('lang-toggle');
+
+// ── Toggle chat ──
+chatToggle.addEventListener('click', () => {
+  const isOpen = chatWindow.classList.toggle('visible');
+  chatToggle.classList.toggle('open', isOpen);
+  if (isOpen && state.step === 'init') { state.step = 'ask_name'; saveState(); botSay(t('greet')); }
+  else if (isOpen) restoreChat();
+});
+
+// ── Language toggle ──
+langToggle.addEventListener('click', () => {
+  lang = lang === 'en' ? 'hi' : 'en';
+  langToggle.textContent = t('langBtn');
+  document.querySelector('.header-text p').textContent = t('headerSub');
+  chatInput.placeholder = t('placeholder');
+  saveState();
+});
+
+// ── Send message ──
+sendBtn.addEventListener('click', sendUserMsg);
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendUserMsg(); });
+
+function sendUserMsg() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+  chatInput.value = '';
+  addMsg('user', text);
+  resetInactivityTimers();
+  processInput(text);
+}
+
+// ── Add message to chat ──
+function addMsg(role, html, save = true) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + role;
+  if (role === 'bot') wrap.innerHTML = '<div class="avatar">🍃</div>';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = html;
+  wrap.appendChild(bubble);
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  if (save) { state.messages.push({role, html}); saveState(); }
+}
+
+function botSay(text) {
+  // Show typing indicator briefly
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  chatBody.appendChild(typing);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  setTimeout(() => { typing.remove(); addMsg('bot', text); }, 600 + Math.random() * 400);
+}
+
+function botSayImmediate(text) { addMsg('bot', text); }
+
+// ── Restore chat from saved messages ──
+function restoreChat() {
+  chatBody.innerHTML = '';
+  state.messages.forEach(m => addMsg(m.role, m.html, false));
+  // Re-render current step interactive elements if not confirmed
+  if (!state.confirmed) rerenderStep();
+  startInactivityTimers();
+}
+
+function rerenderStep() {
+  const s = state.step;
+  if (s === 'ask_mood') showOptions(t('moodOpts'), handleMood);
+  else if (s === 'ask_service') showOptions(t('serviceOpts'), handleService);
+  else if (s === 'ask_date') showDatePicker();
+  else if (s === 'ask_time') showOptions(t('timeOpts'), handleTime);
+  else if (s === 'ask_therapist') showOptions(t('therapistOpts'), handleTherapistChoice);
+  else if (s === 'ask_special') showSpecialRequestField();
+  else if (s === 'show_summary') showSummaryCard();
+}
+
+// ── Show clickable options ──
+function showOptions(opts, callback) {
+  const row = document.createElement('div');
+  row.className = 'options-row';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = o;
+    btn.addEventListener('click', () => {
+      row.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      addMsg('user', o);
+      resetInactivityTimers();
+      setTimeout(() => callback(o), 300);
+    });
+    row.appendChild(btn);
+  });
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// ── Date picker ──
+function showDatePicker() {
+  const wrap = document.createElement('div');
+  wrap.className = 'date-picker-wrap';
+  const today = new Date().toISOString().split('T')[0];
+  wrap.innerHTML = `<input type="date" min="${today}" value="${today}"><button class="date-confirm-btn">${lang==='hi'?'आगे बढ़ें':'Continue'}</button>`;
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  wrap.querySelector('.date-confirm-btn').addEventListener('click', () => {
+    const val = wrap.querySelector('input').value;
+    if (!val) return;
+    addMsg('user', val);
+    resetInactivityTimers();
+    handleDate(val);
+  });
+}
+
+// ── Service card ──
+function showServiceCard(serviceName) {
+  const info = SERVICES[serviceName] || SERVICES['Other'];
+  const card = document.createElement('div');
+  card.className = 'service-card';
+  card.innerHTML = `<h4>${serviceName}</h4><p>${info.desc}</p><p class="price-tag">${info.dur} · ${info.price}</p>`;
+  chatBody.appendChild(card);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  state.messages.push({role:'widget', html: card.outerHTML});
+  saveState();
+}
+
+// ── Special request field ──
+function showSpecialRequestField() {
+  const wrap = document.createElement('div');
+  wrap.className = 'special-req-wrap';
+  wrap.innerHTML = `<textarea placeholder="${t('specialPlaceholder')}"></textarea><div style="display:flex;gap:8px"><button class="date-confirm-btn submit-special">${lang==='hi'?'जमा करें':'Submit'}</button><button class="date-confirm-btn skip-special" style="background:transparent;color:#5D4037;border:1.5px solid #D4A574">${t('skipText')}</button></div>`;
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  wrap.querySelector('.submit-special').addEventListener('click', () => {
+    const val = wrap.querySelector('textarea').value.trim();
+    handleSpecial(val || 'None');
+  });
+  wrap.querySelector('.skip-special').addEventListener('click', () => handleSpecial('None'));
+}
+
+// ═══════════════════════════════════════════
+//  CONVERSATION FLOW HANDLERS
+// ═══════════════════════════════════════════
+
+function processInput(text) {
+  const s = state.step;
+  if (s === 'ask_name') { state.name = text; state.step = 'ask_returning'; saveState(); setTimeout(() => { botSay(t('askReturning').replace('{name}', state.name)); setTimeout(() => showOptions(t('returningOpts'), handleReturning), 1100); }, 200); }
+  else if (s === 'ask_therapist_name') { state.therapist = text; state.step = 'ask_phone'; saveState(); botSay(t('askPhone')); }
+  else if (s === 'ask_phone') { if (!/^[\d\s\+\-\(\)]{7,15}$/.test(text)) { botSay(lang==='hi'?'कृपया एक सही फ़ोन नंबर दें':'Please enter a valid phone number.'); return; } state.phone = text; state.step = 'ask_email'; saveState(); botSay(t('askEmail')); }
+  else if (s === 'ask_email') { if (!/\S+@\S+\.\S+/.test(text)) { botSay(lang==='hi'?'कृपया एक सही ईमेल दें':'Please enter a valid email address.'); return; } state.email = text; state.step = 'ask_special'; saveState(); botSay(t('askSpecial')); setTimeout(() => showSpecialRequestField(), 1100); }
+  else if (s === 'ask_other_service') { state.service = text; state.step = 'ask_date'; saveState(); botSay(t('askDate')); setTimeout(() => showDatePicker(), 1100); }
+}
+
+function handleReturning(choice) {
+  const isYes = choice === t('returningOpts')[0];
+  state.returning = isYes;
+  state.step = 'ask_mood';
+  saveState();
+  if (isYes) botSay(t('greetBack').replace('{name}', state.name));
+  else botSay(lang==='hi'?`बहुत बढ़िया, ${state.name}! हम आपको एक अद्भुत अनुभव देंगे ✨`:`Wonderful, ${state.name}! You're in for a treat ✨`);
+  setTimeout(() => { botSay(t('askMood').replace('{name}', state.name)); setTimeout(() => showOptions(t('moodOpts'), handleMood), 1100); }, 1200);
+}
+
+function handleMood(choice) {
+  const moodKey = lang === 'hi' ? (HINDI_MOODS[choice] || choice) : choice;
+  state.mood = moodKey;
+  state.step = 'ask_service';
+  saveState();
+  const responses = t('moodResp');
+  const resp = responses[choice] || responses[Object.keys(responses)[0]];
+  botSay(resp);
+  setTimeout(() => { botSay(t('askService')); setTimeout(() => showOptions(t('serviceOpts'), handleService), 1100); }, 1300);
+}
+
+function handleService(choice) {
+  const enService = lang === 'hi' ? (HINDI_TO_EN[choice] || choice) : choice;
+  state.service = choice;
+  state.step = 'show_service_card';
+  saveState();
+  if (enService === 'Other') { botSay(lang==='hi'?'बताइए आप क्या चाहेंगे?':'Tell us what you have in mind, and we\'ll make it happen ✨'); state.step = 'ask_other_service'; saveState(); return; }
+  showServiceCard(choice);
+  setTimeout(() => { state.step = 'ask_date'; saveState(); botSay(t('askDate')); setTimeout(() => showDatePicker(), 1100); }, 800);
+}
+
+function handleDate(val) { state.date = val; state.step = 'ask_time'; saveState(); botSay(t('askTime')); setTimeout(() => showOptions(t('timeOpts'), handleTime), 1100); }
+
+function handleTime(choice) {
+  state.time = lang === 'hi' ? (TIME_MAP_HI[choice] || choice) : choice;
+  state.step = 'ask_therapist';
+  saveState();
+  botSay(t('askTherapist'));
+  setTimeout(() => showOptions(t('therapistOpts'), handleTherapistChoice), 1100);
+}
+
+function handleTherapistChoice(choice) {
+  const isPreference = choice === t('therapistOpts')[1];
+  if (isPreference) { state.step = 'ask_therapist_name'; saveState(); botSay(t('askTherapistName')); }
+  else { state.therapist = lang==='hi'?'कोई पसंद नहीं':'No preference'; state.step = 'ask_phone'; saveState(); botSay(t('askPhone')); }
+}
+
+function handleSpecial(val) {
+  state.special = val === 'None' ? (lang==='hi'?'कोई नहीं':'None') : val;
+  addMsg('user', val === 'None' ? t('skipText') : val);
+  state.step = 'show_summary';
+  saveState();
+  botSay(t('summary'));
+  setTimeout(() => showSummaryCard(), 1200);
+}
+
+// ── Summary card ──
+function showSummaryCard() {
+  const labels = t('summaryLabels');
+  const card = document.createElement('div');
+  card.className = 'summary-card';
+  card.innerHTML = `
+    <h3>🌿 ${lang==='hi'?'बुकिंग सारांश':'Booking Summary'}</h3>
+    <div class="detail-row"><span class="detail-label">${labels.name}</span><span class="detail-value">${state.name}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.service}</span><span class="detail-value">${state.service}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.date}</span><span class="detail-value">${state.date}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.time}</span><span class="detail-value">${state.time}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.therapist}</span><span class="detail-value">${state.therapist}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.phone}</span><span class="detail-value">${state.phone}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.email}</span><span class="detail-value">${state.email}</span></div>
+    <div class="detail-row"><span class="detail-label">${labels.special}</span><span class="detail-value">${state.special}</span></div>
+    <div class="spa-watermark">Serenity Spa · Bengaluru</div>`;
+  chatBody.appendChild(card);
+  state.messages.push({role:'widget',html:card.outerHTML});
+
+  const btn = document.createElement('button');
+  btn.className = 'confirm-btn';
+  btn.textContent = t('confirmBtn');
+  btn.addEventListener('click', confirmBooking);
+  chatBody.appendChild(btn);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  saveState();
+}
+
+// ── Confirmation ──
+function confirmBooking() {
+  state.confirmed = true;
+  const ref = 'SRN-' + Date.now().toString(36).toUpperCase().slice(-6) + Math.random().toString(36).toUpperCase().slice(2,5);
+  state.ref = ref;
+  saveState();
+  clearInactivityTimers();
+
+  // Build WhatsApp message
+  const waMsg = encodeURIComponent(`Hi Serenity Spa! Here's my booking:\n\nName: ${state.name}\nService: ${state.service}\nDate: ${state.date}\nTime: ${state.time}\nTherapist: ${state.therapist}\nPhone: ${state.phone}\nEmail: ${state.email}\nSpecial Requests: ${state.special}\nRef: ${ref}\n\nPlease confirm. Thank you! 🌿`);
+  const waURL = `https://wa.me/919XXXXXXXXX?text=${waMsg}`;
+
+  const screen = document.createElement('div');
+  screen.className = 'confirmation-screen';
+  screen.innerHTML = `
+    <div class="check-circle">✓</div>
+    <h3>${t('confirmed').replace('{name}', state.name)}</h3>
+    <div class="ref-num">${lang==='hi'?'रेफ़रेंस':'Ref'}: ${ref}</div>
+    <p>${t('confirmMsg')}</p>
+    <a href="${waURL}" target="_blank" rel="noopener"><button class="whatsapp-btn">${t('whatsappBtn')}</button></a>`;
+  chatBody.innerHTML = '';
+  chatBody.appendChild(screen);
+  state.messages = [{role:'widget', html:screen.outerHTML}];
+  inputArea.classList.add('disabled');
+  saveState();
+}
+
+// ═══════════════════════════════════════════
+//  INACTIVITY FOLLOW-UP LOGIC
+// ═══════════════════════════════════════════
+function startInactivityTimers() {
+  if (state.confirmed || state.step === 'init' || state.step === 'ask_name') return;
+  clearInactivityTimers();
+  if (!state.followUp1Sent) {
+    followUpTimer1 = setTimeout(() => {
+      if (!state.confirmed) { botSayImmediate(t('followUp1').replace('{name}', state.name)); state.followUp1Sent = true; saveState(); }
+      if (!state.followUp2Sent) {
+        followUpTimer2 = setTimeout(() => {
+          if (!state.confirmed) { botSayImmediate(t('followUp2')); state.followUp2Sent = true; saveState(); }
+        }, 3 * 60 * 1000);
+      }
+    }, 5 * 60 * 1000);
+  } else if (!state.followUp2Sent) {
+    followUpTimer2 = setTimeout(() => {
+      if (!state.confirmed) { botSayImmediate(t('followUp2')); state.followUp2Sent = true; saveState(); }
+    }, 3 * 60 * 1000);
+  }
+}
+
+function clearInactivityTimers() { clearTimeout(followUpTimer1); clearTimeout(followUpTimer2); }
+function resetInactivityTimers() { clearInactivityTimers(); state.followUp1Sent = false; state.followUp2Sent = false; startInactivityTimers(); }
+
+// ── Auto-start timers if state exists ──
+if (state.step !== 'init' && state.step !== 'ask_name' && !state.confirmed) startInactivityTimers();
+</script>
+</body>
+</html>
