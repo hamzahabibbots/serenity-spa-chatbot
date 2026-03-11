@@ -586,6 +586,9 @@ function resetInactivityTimers() { clearInactivityTimers(); state.followUp1Sent 
 
 // ── Auto-start timers if state exists ──
 if (state.step !== 'init' && state.step !== 'ask_name' && !state.confirmed) startInactivityTimers();
+
+// ── Auto-open chat on page load ──
+setTimeout(() => { chatToggle.click(); }, 500);
 </script>
 </body>
 </html>
