@@ -41,8 +41,7 @@ body{font-family:'DM Sans',sans-serif;background:#FDF8F0;color:#3E2723;min-heigh
 .chat-header .spa-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#C9A96E,#D4A574);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
 .chat-header .header-text h2{font-family:'Cormorant Garamond',serif;color:#E8D5B7;font-size:1.15rem;font-weight:600}
 .chat-header .header-text p{color:#C4A08A;font-size:.75rem;margin-top:2px}
-#lang-toggle{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.12);border:1px solid rgba(228,213,183,.25);color:#E8D5B7;font-size:.7rem;padding:4px 10px;border-radius:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
-#lang-toggle:hover{background:rgba(255,255,255,.22)}
+
 
 /* ── Messages area ── */
 .chat-body{flex:1;overflow-y:auto;padding:16px 16px 8px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth}
@@ -117,8 +116,7 @@ body{font-family:'DM Sans',sans-serif;background:#FDF8F0;color:#3E2723;min-heigh
 .confirmation-screen h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#3E2723;margin-bottom:6px}
 .confirmation-screen .ref-num{font-size:.85rem;color:#B8860B;font-weight:600;margin-bottom:12px}
 .confirmation-screen p{font-size:.84rem;color:#5D4037;margin-bottom:16px}
-.whatsapp-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:14px;border:none;background:#25D366;color:#fff;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:transform .2s}
-.whatsapp-btn:hover{transform:translateY(-2px)}
+
 
 /* ── Special request textarea ── */
 .special-req-wrap{animation:fadeInMsg .45s ease both}
@@ -152,7 +150,7 @@ body{font-family:'DM Sans',sans-serif;background:#FDF8F0;color:#3E2723;min-heigh
       <h2>Serenity Spa</h2>
       <p>Your wellness journey starts here</p>
     </div>
-    <button id="lang-toggle" aria-label="Switch language">हिंदी</button>
+
   </div>
   <div class="chat-body" id="chat-body"></div>
   <div class="chat-input-area" id="input-area">
@@ -167,82 +165,41 @@ body{font-family:'DM Sans',sans-serif;background:#FDF8F0;color:#3E2723;min-heigh
 //  Single-file vanilla JS, localStorage persistence
 // ═══════════════════════════════════════════════════════
 
-/* ── Multilingual content ── */
-const LANG = {
-  en: {
-    greet: "Welcome to Serenity Spa 🌿 I'm here to help you book a truly relaxing experience. May I know your name?",
-    greetBack: "Welcome back, {name}! We're glad you're treating yourself again 🌿 What would you like to book today?",
-    askReturning: "Lovely to have you here, {name} ✨ Have you visited Serenity Spa before?",
-    returningOpts: ["Yes, I have", "No, first time"],
-    askMood: "What are you looking for today, {name}?",
-    moodOpts: ["Relaxation", "Pain Relief", "Skin Care", "A Treat for Someone Special"],
-    moodResp: {
-      "Relaxation": "Wonderful — let's find something to melt all that stress away 💆",
-      "Pain Relief": "We'll make sure you leave feeling renewed and pain-free 🙌",
-      "Skin Care": "Glowing skin, coming right up! ✨",
-      "A Treat for Someone Special": "How thoughtful! Let's make it truly memorable 🎁"
-    },
-    askService: "Here are our signature experiences — which one speaks to you?",
-    serviceOpts: ["Swedish Massage", "Deep Tissue", "Couple's Spa", "Facial", "Body Scrub", "Other"],
-    askDate: "When would you like to visit us? Pick a date that works for you:",
-    askTime: "And your preferred time slot?",
-    timeOpts: ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM"],
-
-    askPhone: "Could I have your phone number for the booking confirmation?",
-    askEmail: "And your email address, please?",
-    askSpecial: "Any special requests or things we should know? (allergies, pressure preference, etc.)",
-    specialPlaceholder: "e.g. Light pressure please, allergic to nuts...",
-    skipText: "No, that's all",
-    summary: "Here's your booking summary — please review:",
-    confirmBtn: "Confirm Booking ✨",
-    confirmed: "You're all set, {name}! 🎉",
-    confirmSub: "Your tranquil experience awaits.",
-    confirmMsg: "We've reserved your spot. You'll receive a confirmation shortly.",
-    whatsappBtn: "📱 Send to WhatsApp",
-    followUp1: "Hey {name}, still thinking about it? Your slot is not confirmed yet — it only takes 30 more seconds to lock it in 🌿",
-    followUp2: "We'd love to have you in. Whenever you're ready, just pick up where you left off 💆",
-    summaryLabels: {name:"Name",service:"Service",date:"Date",time:"Time",phone:"Phone",email:"Email",special:"Special Requests"},
-    placeholder: "Type your message...",
-    headerSub: "Your wellness journey starts here",
-    langBtn: "हिंदी"
+/* ── Content strings ── */
+const TEXT = {
+  greet: "Welcome to Serenity Spa 🌿 I'm here to help you book a truly relaxing experience. May I know your name?",
+  greetBack: "Welcome back, {name}! We're glad you're treating yourself again 🌿 What would you like to book today?",
+  askReturning: "Lovely to have you here, {name} ✨ Have you visited Serenity Spa before?",
+  returningOpts: ["Yes, I have", "No, first time"],
+  askMood: "What are you looking for today, {name}?",
+  moodOpts: ["Relaxation", "Pain Relief", "Skin Care", "A Treat for Someone Special"],
+  moodResp: {
+    "Relaxation": "Wonderful — let's find something to melt all that stress away 💆",
+    "Pain Relief": "We'll make sure you leave feeling renewed and pain-free 🙌",
+    "Skin Care": "Glowing skin, coming right up! ✨",
+    "A Treat for Someone Special": "How thoughtful! Let's make it truly memorable 🎁"
   },
-  hi: {
-    greet: "सेरेनिटी स्पा में आपका स्वागत है 🌿 मैं आपकी बुकिंग में मदद करने के लिए यहाँ हूँ। आपका शुभ नाम?",
-    greetBack: "वापसी पर स्वागत है, {name}! खुशी है कि आप फिर से अपना ख्याल रख रहे हैं 🌿",
-    askReturning: "यहाँ आकर अच्छा लगा, {name} ✨ क्या आप पहले सेरेनिटी स्पा आ चुके हैं?",
-    returningOpts: ["हाँ, आ चुका/चुकी हूँ", "नहीं, पहली बार"],
-    askMood: "आज आप क्या ढूंढ रहे हैं, {name}?",
-    moodOpts: ["आराम", "दर्द से राहत", "त्वचा की देखभाल", "किसी खास के लिए उपहार"],
-    moodResp: {
-      "आराम": "बहुत बढ़िया — चलिए सारा तनाव दूर करते हैं 💆",
-      "दर्द से राहत": "हम सुनिश्चित करेंगे कि आप तरोताज़ा महसूस करें 🙌",
-      "त्वचा की देखभाल": "चमकती त्वचा, बस अभी! ✨",
-      "किसी खास के लिए उपहार": "कितना सोचा-समझा! चलिए इसे यादगार बनाते हैं 🎁"
-    },
-    askService: "हमारे विशेष अनुभव — कौन सा आपको पसंद है?",
-    serviceOpts: ["स्वीडिश मसाज", "डीप टिश्यू", "कपल्स स्पा", "फेशियल", "बॉडी स्क्रब", "अन्य"],
-    askDate: "आप कब आना चाहेंगे? एक तारीख चुनें:",
-    askTime: "और आपका पसंदीदा समय?",
-    timeOpts: ["सुबह 10", "दोपहर 12", "दोपहर 2", "शाम 4", "शाम 6"],
+  askService: "Here are our signature experiences — which one speaks to you?",
+  serviceOpts: ["Swedish Massage", "Deep Tissue", "Couple's Spa", "Facial", "Body Scrub", "Other"],
+  askDate: "When would you like to visit us? Pick a date that works for you:",
+  askTime: "And your preferred time slot?",
+  timeOpts: ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM"],
+  askPhone: "Could I have your phone number for the booking confirmation?",
+  askEmail: "And your email address, please?",
+  askSpecial: "Any special requests or things we should know? (allergies, pressure preference, etc.)",
+  specialPlaceholder: "e.g. Light pressure please, allergic to nuts...",
+  skipText: "No, that's all",
+  summary: "Here's your booking summary — please review:",
+  confirmBtn: "Confirm Booking ✨",
+  confirmed: "You're all set, {name}! 🎉",
+  confirmSub: "Your tranquil experience awaits.",
+  confirmMsg: "We've reserved your spot. You'll receive a confirmation shortly.",
 
-    askPhone: "बुकिंग की पुष्टि के लिए आपका फ़ोन नंबर?",
-    askEmail: "और आपका ईमेल पता?",
-    askSpecial: "कोई विशेष अनुरोध? (एलर्जी, दबाव प्राथमिकता, आदि)",
-    specialPlaceholder: "जैसे: हल्का दबाव, नट्स से एलर्जी...",
-    skipText: "नहीं, बस इतना ही",
-    summary: "आपकी बुकिंग का सारांश — कृपया जाँचें:",
-    confirmBtn: "बुकिंग पक्की करें ✨",
-    confirmed: "सब तैयार है, {name}! 🎉",
-    confirmSub: "आपका शांतिपूर्ण अनुभव आपका इंतज़ार कर रहा है।",
-    confirmMsg: "हमने आपकी जगह आरक्षित कर ली है। आपको जल्द ही पुष्टि मिलेगी।",
-    whatsappBtn: "📱 WhatsApp पर भेजें",
-    followUp1: "अरे {name}, अभी भी सोच रहे हैं? आपका स्लॉट अभी पक्का नहीं हुआ — बस 30 सेकंड और लगेंगे 🌿",
-    followUp2: "हम आपका इंतज़ार कर रहे हैं। जब भी तैयार हों, वहीं से शुरू करें जहाँ छोड़ा था 💆",
-    summaryLabels: {name:"नाम",service:"सेवा",date:"तारीख",time:"समय",phone:"फ़ोन",email:"ईमेल",special:"विशेष अनुरोध"},
-    placeholder: "अपना संदेश लिखें...",
-    headerSub: "आपकी कल्याण यात्रा यहाँ से शुरू होती है",
-    langBtn: "English"
-  }
+  followUp1: "Hey {name}, still thinking about it? Your slot is not confirmed yet — it only takes 30 more seconds to lock it in 🌿",
+  followUp2: "We'd love to have you in. Whenever you're ready, just pick up where you left off 💆",
+  summaryLabels: {name:"Name",service:"Service",date:"Date",time:"Time",phone:"Phone",email:"Email",special:"Special Requests"},
+  placeholder: "Type your message...",
+  headerSub: "Your wellness journey starts here"
 };
 
 /* ── Service details ── */
@@ -252,36 +209,23 @@ const SERVICES = {
   "Couple's Spa":    {desc:"90 mins shared bliss — side-by-side massage for two, with aromatherapy and warm towels.", price:"₹5,500", dur:"90 min"},
   "Facial":          {desc:"45 mins of luxurious skin renewal with organic serums and a radiance-boosting mask.", price:"₹2,000", dur:"45 min"},
   "Body Scrub":      {desc:"50 mins of gentle exfoliation with natural salts and essential oils for silky-smooth skin.", price:"₹2,200", dur:"50 min"},
-  "Other":           {desc:"Tell us what you'd like and we'll craft a bespoke experience just for you.", price:"Custom", dur:"Flexible"},
-  // Hindi mappings
-  "स्वीडिश मसाज": {desc:"60 मिनट की पूरे शरीर की विश्राम मालिश। तनाव दूर करने का शानदार तरीका।", price:"₹2,500", dur:"60 मिनट"},
-  "डीप टिश्यू":     {desc:"75 मिनट की गहरी मांसपेशियों की थेरेपी।", price:"₹3,200", dur:"75 मिनट"},
-  "कपल्स स्पा":    {desc:"90 मिनट का साझा आनंद — दो लोगों के लिए साथ-साथ मालिश।", price:"₹5,500", dur:"90 मिनट"},
-  "फेशियल":          {desc:"45 मिनट की त्वचा नवीनीकरण थेरेपी।", price:"₹2,000", dur:"45 मिनट"},
-  "बॉडी स्क्रब":      {desc:"50 मिनट का प्राकृतिक एक्सफोलिएशन।", price:"₹2,200", dur:"50 मिनट"},
-  "अन्य":           {desc:"आप बताएं और हम आपके लिए विशेष अनुभव तैयार करेंगे।", price:"कस्टम", dur:"लचीला"}
+  "Other":           {desc:"Tell us what you'd like and we'll craft a bespoke experience just for you.", price:"Custom", dur:"Flexible"}
 };
-
-// Map Hindi services → English for internal tracking
-const HINDI_TO_EN = {"स्वीडिश मसाज":"Swedish Massage","डीप टिश्यू":"Deep Tissue","कपल्स स्पा":"Couple's Spa","फेशियल":"Facial","बॉडी स्क्रब":"Body Scrub","अन्य":"Other"};
-const HINDI_MOODS = {"आराम":"Relaxation","दर्द से राहत":"Pain Relief","त्वचा की देखभाल":"Skin Care","किसी खास के लिए उपहार":"A Treat for Someone Special"};
-const TIME_MAP_HI = {"सुबह 10":"10:00 AM","दोपहर 12":"12:00 PM","दोपहर 2":"2:00 PM","शाम 4":"4:00 PM","शाम 6":"6:00 PM"};
 
 // ── State ──
 const STORE_KEY = 'serenity_spa_state';
 let state = loadState();
-let lang = state.lang || 'en';
 let followUpTimer1 = null, followUpTimer2 = null;
 
 function defaultState() {
-  return {step:'init',name:'',returning:false,mood:'',service:'',date:'',time:'',phone:'',email:'',special:'',lang:'en',confirmed:false,followUp1Sent:false,followUp2Sent:false,messages:[]};
+  return {step:'init',name:'',returning:false,mood:'',service:'',date:'',time:'',phone:'',email:'',special:'',confirmed:false,followUp1Sent:false,followUp2Sent:false,messages:[]};
 }
 function loadState() {
   try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); return s && s.step ? s : defaultState(); }
   catch(e) { return defaultState(); }
 }
-function saveState() { state.lang = lang; localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-function t(key) { return LANG[lang][key] || LANG.en[key] || key; }
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function t(key) { return TEXT[key] || key; }
 
 // ── DOM refs ──
 const chatBody = document.getElementById('chat-body');
@@ -290,7 +234,6 @@ const sendBtn = document.getElementById('send-btn');
 const inputArea = document.getElementById('input-area');
 const chatWindow = document.getElementById('chat-window');
 const chatToggle = document.getElementById('chat-toggle');
-const langToggle = document.getElementById('lang-toggle');
 
 // ── Toggle chat ──
 chatToggle.addEventListener('click', () => {
@@ -300,14 +243,7 @@ chatToggle.addEventListener('click', () => {
   else if (isOpen) restoreChat();
 });
 
-// ── Language toggle ──
-langToggle.addEventListener('click', () => {
-  lang = lang === 'en' ? 'hi' : 'en';
-  langToggle.textContent = t('langBtn');
-  document.querySelector('.header-text p').textContent = t('headerSub');
-  chatInput.placeholder = t('placeholder');
-  saveState();
-});
+
 
 // ── Send message ──
 sendBtn.addEventListener('click', sendUserMsg);
@@ -393,7 +329,7 @@ function showDatePicker() {
   const wrap = document.createElement('div');
   wrap.className = 'date-picker-wrap';
   const today = new Date().toISOString().split('T')[0];
-  wrap.innerHTML = `<input type="date" min="${today}" value="${today}"><button class="date-confirm-btn">${lang==='hi'?'आगे बढ़ें':'Continue'}</button>`;
+  wrap.innerHTML = `<input type="date" min="${today}" value="${today}"><button class="date-confirm-btn">Continue</button>`;
   chatBody.appendChild(wrap);
   chatBody.scrollTop = chatBody.scrollHeight;
   wrap.querySelector('.date-confirm-btn').addEventListener('click', () => {
@@ -421,7 +357,7 @@ function showServiceCard(serviceName) {
 function showSpecialRequestField() {
   const wrap = document.createElement('div');
   wrap.className = 'special-req-wrap';
-  wrap.innerHTML = `<textarea placeholder="${t('specialPlaceholder')}"></textarea><div style="display:flex;gap:8px"><button class="date-confirm-btn submit-special">${lang==='hi'?'जमा करें':'Submit'}</button><button class="date-confirm-btn skip-special" style="background:transparent;color:#5D4037;border:1.5px solid #D4A574">${t('skipText')}</button></div>`;
+  wrap.innerHTML = `<textarea placeholder="${t('specialPlaceholder')}"></textarea><div style="display:flex;gap:8px"><button class="date-confirm-btn submit-special">Submit</button><button class="date-confirm-btn skip-special" style="background:transparent;color:#5D4037;border:1.5px solid #D4A574">${t('skipText')}</button></div>`;
   chatBody.appendChild(wrap);
   chatBody.scrollTop = chatBody.scrollHeight;
   wrap.querySelector('.submit-special').addEventListener('click', () => {
@@ -439,8 +375,8 @@ function processInput(text) {
   const s = state.step;
   if (s === 'ask_name') { state.name = text; state.step = 'ask_returning'; saveState(); setTimeout(() => { botSay(t('askReturning').replace('{name}', state.name)); setTimeout(() => showOptions(t('returningOpts'), handleReturning), 1100); }, 200); }
 
-  else if (s === 'ask_phone') { if (!/^[\d\s\+\-\(\)]{7,15}$/.test(text)) { botSay(lang==='hi'?'कृपया एक सही फ़ोन नंबर दें':'Please enter a valid phone number.'); return; } state.phone = text; state.step = 'ask_email'; saveState(); botSay(t('askEmail')); }
-  else if (s === 'ask_email') { if (!/\S+@\S+\.\S+/.test(text)) { botSay(lang==='hi'?'कृपया एक सही ईमेल दें':'Please enter a valid email address.'); return; } state.email = text; state.step = 'ask_special'; saveState(); botSay(t('askSpecial')); setTimeout(() => showSpecialRequestField(), 1100); }
+  else if (s === 'ask_phone') { if (!/^[\d\s\+\-\(\)]{7,15}$/.test(text)) { botSay('Please enter a valid phone number.'); return; } state.phone = text; state.step = 'ask_email'; saveState(); botSay(t('askEmail')); }
+  else if (s === 'ask_email') { if (!/\S+@\S+\.\S+/.test(text)) { botSay('Please enter a valid email address.'); return; } state.email = text; state.step = 'ask_special'; saveState(); botSay(t('askSpecial')); setTimeout(() => showSpecialRequestField(), 1100); }
   else if (s === 'ask_other_service') { state.service = text; state.step = 'ask_date'; saveState(); botSay(t('askDate')); setTimeout(() => showDatePicker(), 1100); }
 }
 
@@ -450,13 +386,12 @@ function handleReturning(choice) {
   state.step = 'ask_mood';
   saveState();
   if (isYes) botSay(t('greetBack').replace('{name}', state.name));
-  else botSay(lang==='hi'?`बहुत बढ़िया, ${state.name}! हम आपको एक अद्भुत अनुभव देंगे ✨`:`Wonderful, ${state.name}! You're in for a treat ✨`);
+  else botSay(`Wonderful, ${state.name}! You're in for a treat ✨`);
   setTimeout(() => { botSay(t('askMood').replace('{name}', state.name)); setTimeout(() => showOptions(t('moodOpts'), handleMood), 1100); }, 1200);
 }
 
 function handleMood(choice) {
-  const moodKey = lang === 'hi' ? (HINDI_MOODS[choice] || choice) : choice;
-  state.mood = moodKey;
+  state.mood = choice;
   state.step = 'ask_service';
   saveState();
   const responses = t('moodResp');
@@ -466,11 +401,10 @@ function handleMood(choice) {
 }
 
 function handleService(choice) {
-  const enService = lang === 'hi' ? (HINDI_TO_EN[choice] || choice) : choice;
   state.service = choice;
   state.step = 'show_service_card';
   saveState();
-  if (enService === 'Other') { botSay(lang==='hi'?'बताइए आप क्या चाहेंगे?':'Tell us what you have in mind, and we\'ll make it happen ✨'); state.step = 'ask_other_service'; saveState(); return; }
+  if (choice === 'Other') { botSay('Tell us what you have in mind, and we\'ll make it happen ✨'); state.step = 'ask_other_service'; saveState(); return; }
   showServiceCard(choice);
   setTimeout(() => { state.step = 'ask_date'; saveState(); botSay(t('askDate')); setTimeout(() => showDatePicker(), 1100); }, 800);
 }
@@ -478,7 +412,7 @@ function handleService(choice) {
 function handleDate(val) { state.date = val; state.step = 'ask_time'; saveState(); botSay(t('askTime')); setTimeout(() => showOptions(t('timeOpts'), handleTime), 1100); }
 
 function handleTime(choice) {
-  state.time = lang === 'hi' ? (TIME_MAP_HI[choice] || choice) : choice;
+  state.time = choice;
   state.step = 'ask_phone';
   saveState();
   botSay(t('askPhone'));
@@ -487,7 +421,7 @@ function handleTime(choice) {
 
 
 function handleSpecial(val) {
-  state.special = val === 'None' ? (lang==='hi'?'कोई नहीं':'None') : val;
+  state.special = val === 'None' ? 'None' : val;
   addMsg('user', val === 'None' ? t('skipText') : val);
   state.step = 'show_summary';
   saveState();
@@ -501,7 +435,7 @@ function showSummaryCard() {
   const card = document.createElement('div');
   card.className = 'summary-card';
   card.innerHTML = `
-    <h3>🌿 ${lang==='hi'?'बुकिंग सारांश':'Booking Summary'}</h3>
+    <h3>🌿 Booking Summary</h3>
     <div class="detail-row"><span class="detail-label">${labels.name}</span><span class="detail-value">${state.name}</span></div>
     <div class="detail-row"><span class="detail-label">${labels.service}</span><span class="detail-value">${state.service}</span></div>
     <div class="detail-row"><span class="detail-label">${labels.date}</span><span class="detail-value">${state.date}</span></div>
@@ -531,18 +465,13 @@ function confirmBooking() {
   saveState();
   clearInactivityTimers();
 
-  // Build WhatsApp message
-  const waMsg = encodeURIComponent(`Hi Serenity Spa! Here's my booking:\n\nName: ${state.name}\nService: ${state.service}\nDate: ${state.date}\nTime: ${state.time}\nPhone: ${state.phone}\nEmail: ${state.email}\nSpecial Requests: ${state.special}\nRef: ${ref}\n\nPlease confirm. Thank you! 🌿`);
-  const waURL = `https://wa.me/919XXXXXXXXX?text=${waMsg}`;
-
   const screen = document.createElement('div');
   screen.className = 'confirmation-screen';
   screen.innerHTML = `
     <div class="check-circle">✓</div>
     <h3>${t('confirmed').replace('{name}', state.name)}</h3>
-    <div class="ref-num">${lang==='hi'?'रेफ़रेंस':'Ref'}: ${ref}</div>
-    <p>${t('confirmMsg')}</p>
-    <a href="${waURL}" target="_blank" rel="noopener"><button class="whatsapp-btn">${t('whatsappBtn')}</button></a>`;
+    <div class="ref-num">Ref: ${ref}</div>
+    <p>${t('confirmMsg')}</p>`;
   chatBody.innerHTML = '';
   chatBody.appendChild(screen);
   state.messages = [{role:'widget', html:screen.outerHTML}];
